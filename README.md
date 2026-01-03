@@ -133,7 +133,7 @@ cd autojudge
 ### 2. Install dependencies
 
 ```bash
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 ```
 
 ### 3. Ensure the trained model files are present in the project root
@@ -148,7 +148,7 @@ score_regressor.pkl
 ### 4. Run the Streamlit application
 
 ```bash
-streamlit run app.py
+python -m streamlit run app.py
 ```
 
 ---
