@@ -65,8 +65,9 @@ def load_models():
     stage1 = joblib.load("stage1_hard_classifier.pkl")
     HARD_T = joblib.load("hard_threshold.pkl")
     stage2 = joblib.load("stage2_easy_medium.pkl")
-    reg    = joblib.load("score_regressor.pkl")
-    return stage1, HARD_T, stage2, reg
+    regressors = joblib.load("score_regressors.pkl") 
+    return stage1, HARD_T, stage2, regressors
+    #return stage1, HARD_T, stage2, reg
 
 @st.cache_data(ttl=3600)
 def validate_with_ai(full_text: str, api_key: str) -> tuple[bool, str]:
@@ -147,7 +148,7 @@ def run_prediction_pipeline(full_text_input):
     st.markdown('<div class="dotted-line"></div>', unsafe_allow_html=True)
 
     try:
-        stage1, HARD_T, stage2, reg = load_models()
+        stage1, HARD_T, stage2, regressors = load_models()
 
         X = pd.DataFrame({"full_text": [full_text_input]})
         
@@ -168,9 +169,11 @@ def run_prediction_pipeline(full_text_input):
         else:
             level = stage2.predict(X)[0]
         
-        score = float(reg.predict(X)[0])
-        score = max(1.0, min(10.0, score))
-        
+        #score = float(reg.predict(X)[0])
+        #score = max(1.0, min(10.0, score))
+        # NEW (uses class-specific regressors correctly)
+        raw_score = regressors[level].predict(X)[0]
+        score = np.clip(raw_score, 1.0, 10.0)
         st.markdown('<h2 class="result-title">Prediction Results</h2>', unsafe_allow_html=True)
         
         col1, col2 = st.columns([1, 1])
