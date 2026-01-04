@@ -1,186 +1,281 @@
 # Problem Difficulty Predictor
 
-## Project Overview
-This project predicts the difficulty of competitive programming problems using only their textual descriptions.
+## Overview
+
+The **Problem Difficulty Predictor** is a machine learning system that estimates the difficulty of competitive programming problems using **only their textual descriptions**.
 
 The system predicts:
-- **Difficulty Class**: Easy, Medium, or Hard  
-- **Difficulty Score**: A numeric score between 1 and 10  
 
-A Streamlit web application is provided where users can paste a problem statement and receive instant predictions.
+* **Difficulty Class**: Easy, Medium, or Hard
+* **Difficulty Score**: A numerical value between **1 and 10**
+
+A **Streamlit-based web application** allows users to paste a problem statement and instantly receive predictions.
 
 ---
 
-## Demo Screenshots
+## Demo
 
-**App Interface**
+### Application Interface
 
 ![App UI](https://github.com/user-attachments/assets/535ddc71-bedd-4631-8f33-1669dd1a6817)
 
 ---
 
-## Live Deployed Application
-You can access the deployed application here:
+## Live Application
 
-https://sushma9112006-autojudge-app-f60sdv.streamlit.app/
-
----
-
-## Dataset Used
-**Source**: https://github.com/AREEG94FAHAD/TaskComplexityEval-24  
-**Format**: JSONL  
-
-**Labels**:
-- `problem_class` (Easy, Medium, Hard)
-- `problem_score` (numeric difficulty score)
-
-**Preprocessing Steps**:
-- All textual fields were combined into a single text field.
-- Duplicate problem statements were removed.
-- No duplicate entries with conflicting labels were found.
-- No missing (null) values were present in the dataset.
+🔗 [https://sushma9112006-autojudge-app-f60sdv.streamlit.app/](https://sushma9112006-autojudge-app-f60sdv.streamlit.app/)
 
 ---
 
-## Feature Extraction
+## Dataset
 
-### Text Features
-- TF-IDF with unigrams and bigrams
-- Sublinear term frequency scaling
-- Vocabulary filtered using document frequency thresholds
+**Source**:
+[https://github.com/AREEG94FAHAD/TaskComplexityEval-24](https://github.com/AREEG94FAHAD/TaskComplexityEval-24)
 
-### Numeric Features
-- Length of the problem text
-- Count of mathematical symbols
-- Binary presence of common algorithmic keywords such as DP, graphs, BFS, DFS, greedy, etc.
+**Format**: JSON Lines (JSONL)
 
----
+**Available Labels**:
 
-## Model Architecture
-
-Classification is performed using a two-stage approach.
-
-### Stage 1: Hard vs Not-Hard
-- **Model**: Random Forest Classifier  
-- **Output**: Probability of being Hard  
-- **Decision threshold**: Fixed using 5-fold cross-validation  
-- **Final threshold value**: 0.5343  
-
-### Stage 2: Easy vs Medium
-- Applied only if the problem is not classified as Hard  
-- **Model**: Linear Support Vector Classifier with class weights  
-
-The final output is one of: **Easy**, **Medium**, or **Hard**.
+* `problem_class`: Easy / Medium / Hard
+* `problem_score`: Numeric difficulty score
 
 ---
 
-## Regression Model
-- **Model**: Histogram-based Gradient Boosting Regressor  
-- Predicts a continuous difficulty score  
-- Output score is clipped between **1 and 10**
+## Data Preprocessing
+
+The following preprocessing steps are applied to ensure clean and consistent input:
+
+* All textual fields are merged into a single `full_text` field
+* Unicode normalization and symbol standardization
+* Sentence-level deduplication within each problem
+* Removal of duplicate problems based on cleaned text
+* Verification that no missing values exist
+
+These steps help reduce noise and prevent unintended data leakage.
 
 ---
 
-## Evaluation Metrics
+## Feature Engineering
 
-### Classification Performance
-- **Overall accuracy**: 51%
+### Text-Based Features
 
-**Confusion Matrix**  
-(rows = true labels, columns = predicted labels)  
-Order: Easy,Hard,Medium
+* TF-IDF representation using **unigrams and bigrams**
+* Sublinear term frequency scaling
+* Vocabulary pruning using document frequency thresholds
+
+### Numeric and Heuristic Features
+
+* Length of the problem description
+* Count of mathematical and logical symbols
+* Binary indicators for common algorithmic terms
+  (e.g., DP, BFS, DFS, graphs, greedy, etc.)
+
+All features are combined using a **ColumnTransformer**.
+
+---
+
+## Model Design
+
+The system follows a **two-stage classification pipeline**, followed by **class-conditional regression**.
 
 ```
-
-[[ 81  20  52 ]
-[ 41 211 137 ]
-[ 40 113 128 ]]
-
-````
-
-### Regression Performance
-- **Mean Absolute Error (MAE)**: 1.66  
-- **Root Mean Squared Error (RMSE)**: 1.99  
-
----
-
-## Saved Trained Models
-The following trained model files are included:
-- `stage1_hard_classifier.pkl`
-- `hard_threshold.pkl`
-- `stage2_easy_medium.pkl`
-- `score_regressor.pkl`
+Input Text
+   ↓
+TF-IDF + Numeric Features
+   ↓
+Stage 1: Hard vs Not-Hard Classifier
+   ├── Hard → Hard
+   └── Not-Hard
+          ↓
+     Stage 2: Easy vs Medium Classifier
+          ↓
+    Final Difficulty Class
+          ↓
+   Class-Specific Regressor
+          ↓
+   Final Difficulty Score
+```
 
 ---
 
-## Web Application
+## Classification Models
 
-The Streamlit web application allows users to:
-- Paste a full coding problem description
-- Optionally include input and output formats
-- Receive the predicted difficulty class and difficulty score
+### Stage 1: Hard vs Not-Hard
+
+* **Model**: Random Forest Classifier
+* **Output**: Probability of the problem being Hard
+* **Threshold Selection**: 5-fold cross-validation
+* **Final Threshold**: `0.5384`
+
+This stage prioritizes recall for Hard problems.
 
 ---
 
-## Steps to Run the Project Locally
+### Stage 2: Easy vs Medium
 
-### 1. Clone the repository
+* Applied only when Stage 1 predicts *Not-Hard*
+* **Model**: Linear Support Vector Classifier (Linear SVC)
+* Uses class weighting to handle imbalance
+
+Final output class ∈ **Easy, Medium, Hard**
+
+---
+
+## Regression Models (Class-Based)
+
+The difficulty score is predicted using **separate regressors for each class**.
+
+| Class  | Regression Model                             |
+| ------ | -------------------------------------------- |
+| Easy   | Ridge Regression                             |
+| Medium | Ridge Regression                             |
+| Hard   | HistGradientBoostingRegressor (Poisson loss) |
+
+### Score Constraints
+
+To maintain semantic consistency, predicted scores are clipped:
+
+* **Easy**: ≤ 2.8
+* **Medium**: 2.9 – 5.6
+* **Hard**: 5.6 – 10.0
+
+---
+
+## Model Evaluation
+
+### Classification Results
+
+* **Overall Accuracy**: 51.8%
+
+**Confusion Matrix**
+(Rows = true labels, Columns = predicted labels)
+Order: Easy, Hard, Medium
+
+```
+[[ 80  20  53 ]
+ [ 39 210 140 ]
+ [ 41 104 136 ]]
+```
+
+---
+
+### Regression Results (Test Set Only)
+
+* **MAE**: 1.82
+* **RMSE**: 2.36
+
+No regression model is trained on test data.
+
+---
+
+## Saved Models
+
+The application uses the following pre-trained components:
+
+* Stage 1 Hard classifier
+* Frozen hard-decision threshold
+* Stage 2 Easy/Medium classifier
+* Class-specific regression models
+
+---
+
+## Running the Project Locally (Windows & Linux)
+
+### 1. Clone the Repository
+
 ```bash
 git clone https://github.com/sushma9112006/autojudge
 cd autojudge
-````
+```
 
-### 2. Install dependencies
+---
+
+### 2. Create a Virtual Environment (Recommended)
+
+**Linux / macOS**
 
 ```bash
-python -m pip install -r requirements.txt
+python3 -m venv venv
+source venv/bin/activate
 ```
 
-### 3. Ensure the trained model files are present in the project root
+**Windows (PowerShell / CMD)**
 
-```
-stage1_hard_classifier.pkl
-hard_threshold.pkl
-stage2_easy_medium.pkl
-score_regressor.pkl
+```powershell
+python -m venv venv
+venv\Scripts\activate
 ```
 
-### 4. Run the Streamlit application
+---
+
+### 3. Install Dependencies
 
 ```bash
+pip install -r requirements.txt
+```
+
+---
+
+### 4. Run the Streamlit Application
+
+**Linux / macOS**
+
+```bash
+streamlit run app.py
+```
+
+**Windows (recommended, avoids PATH issues)**
+
+```powershell
 python -m streamlit run app.py
+```
+
+The application will open in your browser at:
+
+```
+http://localhost:8501
 ```
 
 ---
 
 ## Optional: AI-Based Input Validation
 
-This project optionally supports an AI-based validation step using **Google Gemini**.
-This feature only checks whether the input resembles a valid coding problem and does **not** affect difficulty prediction.
+An optional validation layer uses **Google Gemini** to check whether the input resembles a programming problem.
 
-### How to Enable
+* This step runs **before** the ML pipeline
+* It only filters clearly invalid inputs (e.g., greetings, random text)
+* It **does not influence** difficulty classification or scoring
 
-1. Install the optional dependency:
+If no API key is provided, the system runs fully offline using local models.
+
+### Getting a Gemini API Key
+
+1. Visit [https://aistudio.google.com/](https://aistudio.google.com/)
+2. Sign in with a Google account
+3. Generate an API key
+4. Set it as an environment variable
+
+**Windows (PowerShell)**
+
+```powershell
+setx GEMINI_API_KEY "your_api_key_here"
+```
+
+**Linux / macOS**
+
+```bash
+export GEMINI_API_KEY="your_api_key_here"
+```
+
+### Install Required Package
 
 ```bash
 pip install google-generativeai
 ```
 
-2. Visit [https://aistudio.google.com/](https://aistudio.google.com/)
-3. Sign in with a Google account.
-4. Generate a new API key.
-5. Paste the key into the **“Gemini API Key (Optional)”** field in the application sidebar.
-
-If no API key is provided or the library is not installed, the application runs entirely using local machine learning models.
-
 ---
 
-## Demo Video
-
-
----
-
-## Author Details
+## Author
 
 **Name**: Charita Sai Sushma J
 **Project**: Problem Difficulty Predictor
