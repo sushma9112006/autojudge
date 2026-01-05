@@ -13,7 +13,9 @@ A **Streamlit-based web application** allows users to paste a problem statement 
 
 ---
 
-## Demo
+## Demo Link
+
+[https://drive.google.com/file/d/1icXKXm__qya4ig9LF2SR0-4O47w9ToeC/view?usp=drivesdk](https://drive.google.com/file/d/1icXKXm__qya4ig9LF2SR0-4O47w9ToeC/view?usp=drivesdk)
 
 ### Application Interface
 
@@ -23,7 +25,7 @@ A **Streamlit-based web application** allows users to paste a problem statement 
 
 ## Live Application
 
-🔗 [https://sushma9112006-autojudge-app-f60sdv.streamlit.app/](https://sushma9112006-autojudge-app-f60sdv.streamlit.app/)
+[https://sushma9112006-autojudge-app-f60sdv.streamlit.app/](https://sushma9112006-autojudge-app-f60sdv.streamlit.app/)
 
 ---
 
@@ -51,7 +53,7 @@ The following preprocessing steps are applied to ensure clean and consistent inp
 * Removal of duplicate problems based on cleaned text
 * Verification that no missing values exist
 
-These steps help reduce noise and prevent unintended data leakage.
+These steps help reduce noise and improve model robustness.
 
 ---
 
@@ -76,7 +78,7 @@ All features are combined using a **ColumnTransformer**.
 
 ## Model Design
 
-The system follows a **two-stage classification pipeline**, followed by **class-conditional regression**.
+The system follows a **two-stage classification pipeline**, followed by **class-based score calibration**.
 
 ```
 Input Text
@@ -84,16 +86,16 @@ Input Text
 TF-IDF + Numeric Features
    ↓
 Stage 1: Hard vs Not-Hard Classifier
-   ├── Hard → Hard
+   ├── Hard
    └── Not-Hard
           ↓
      Stage 2: Easy vs Medium Classifier
           ↓
     Final Difficulty Class
           ↓
-   Class-Specific Regressor
+   Global Score Regressor
           ↓
-   Final Difficulty Score
+   Class-Based Score Calibration
 ```
 
 ---
@@ -107,7 +109,7 @@ Stage 1: Hard vs Not-Hard Classifier
 * **Threshold Selection**: 5-fold cross-validation
 * **Final Threshold**: `0.5384`
 
-This stage prioritizes recall for Hard problems.
+This stage prioritizes reliable detection of Hard problems.
 
 ---
 
@@ -121,23 +123,25 @@ Final output class ∈ **Easy, Medium, Hard**
 
 ---
 
-## Regression Models (Class-Based)
+## Difficulty Score Prediction
 
-The difficulty score is predicted using **separate regressors for each class**.
+The difficulty score is predicted using a **single global regression model**.
 
-| Class  | Regression Model                             |
-| ------ | -------------------------------------------- |
-| Easy   | Ridge Regression                             |
-| Medium | Ridge Regression                             |
-| Hard   | HistGradientBoostingRegressor (Poisson loss) |
+| Component       | Model            |
+| --------------- | ---------------- |
+| Score Regressor | Ridge Regression |
 
-### Score Constraints
+The regressor is trained on all samples using the same feature pipeline as classification.
 
-To maintain semantic consistency, predicted scores are clipped:
+### Score Calibration
+
+To maintain semantic consistency between predicted class and score, the raw regression outputs are clipped based on the final predicted class:
 
 * **Easy**: ≤ 2.8
-* **Medium**: 2.9 – 5.6
+* **Medium**: 2.9 – 5.5
 * **Hard**: 5.6 – 10.0
+
+This calibration compensates for dataset imbalance and overlapping score distributions.
 
 ---
 
@@ -152,17 +156,17 @@ To maintain semantic consistency, predicted scores are clipped:
 Order: Easy, Hard, Medium
 
 ```
-[[ 80  20  53 ]
- [ 39 210 140 ]
- [ 41 104 136 ]]
+[[ 80  20  53]
+ [ 39 210 140]
+ [ 41 104 136]]
 ```
 
 ---
 
 ### Regression Results (Test Set Only)
 
-* **MAE**: 1.82
-* **RMSE**: 2.36
+* **MAE**: 1.65
+* **RMSE**: 2.07
 
 No regression model is trained on test data.
 
@@ -175,7 +179,7 @@ The application uses the following pre-trained components:
 * Stage 1 Hard classifier
 * Frozen hard-decision threshold
 * Stage 2 Easy/Medium classifier
-* Class-specific regression models
+* Ridge-based score regression model
 
 ---
 
@@ -224,13 +228,13 @@ pip install -r requirements.txt
 streamlit run app.py
 ```
 
-**Windows (recommended, avoids PATH issues)**
+**Windows (recommended)**
 
 ```powershell
 python -m streamlit run app.py
 ```
 
-The application will open in your browser at:
+The application will open at:
 
 ```
 http://localhost:8501
@@ -242,11 +246,11 @@ http://localhost:8501
 
 An optional validation layer uses **Google Gemini** to check whether the input resembles a programming problem.
 
-* This step runs **before** the ML pipeline
-* It only filters clearly invalid inputs (e.g., greetings, random text)
-* It **does not influence** difficulty classification or scoring
+* Runs **before** the ML pipeline
+* Filters clearly invalid inputs (e.g., greetings, random text)
+* Does **not** influence difficulty classification or scoring
 
-If no API key is provided, the system runs fully offline using local models.
+If no API key is provided, the system runs fully offline.
 
 ### Getting a Gemini API Key
 
@@ -273,7 +277,6 @@ export GEMINI_API_KEY="your_api_key_here"
 pip install google-generativeai
 ```
 
----
 
 ## Author
 
