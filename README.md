@@ -163,7 +163,7 @@ Order: Easy, Hard, Medium
 
 ---
 
-### Regression Results (Test Set Only)
+### Regression Results 
 
 * **MAE**: 1.65
 * **RMSE**: 2.07
