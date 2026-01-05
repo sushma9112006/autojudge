@@ -9,7 +9,7 @@ The system predicts:
 * **Difficulty Class**: Easy, Medium, or Hard
 * **Difficulty Score**: A numerical value between **1 and 10**
 
-A **Streamlit-based web application** allows users to paste a problem statement and instantly receive predictions.
+A **Streamlit-based web application** allows users to paste a problem statement and receive predictions.
 
 ---
 
@@ -249,7 +249,7 @@ An optional validation layer uses **Google Gemini** to check whether the input r
 * Runs **before** the ML pipeline
 * Filters clearly invalid inputs (e.g., greetings, random text)
 * Does **not** influence difficulty classification or scoring
-
+*You can proceed even when the AI predicts the problem  as invalid
 If no API key is provided, the system runs fully offline.
 
 ### Getting a Gemini API Key
@@ -277,9 +277,7 @@ export GEMINI_API_KEY="your_api_key_here"
 pip install google-generativeai
 ```
 
-
-## Author
-
-**Name**: Charita Sai Sushma J
-**Project**: Problem Difficulty Predictor
-**Technologies**: Python, scikit-learn, Streamlit
+---
+* **Name**: Charita Sai Sushma J
+* **Project**: Autojudge
+---
