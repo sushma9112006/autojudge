@@ -172,7 +172,8 @@ def run_prediction_pipeline(full_text_input):
         #score = float(reg.predict(X)[0])
         #score = max(1.0, min(10.0, score))
         # NEW (uses class-specific regressors correctly)
-        raw_score = regressors[level].predict(X)[0]
+        #raw_score = regressors[level].predict(X)[0]
+        raw_score = regressors.predict(X)[0]
         score = np.clip(raw_score, 1.0, 10.0)
         st.markdown('<h2 class="result-title">Prediction Results</h2>', unsafe_allow_html=True)
         
