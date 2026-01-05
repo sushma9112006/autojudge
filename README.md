@@ -249,7 +249,7 @@ An optional validation layer uses **Google Gemini** to check whether the input r
 * Runs **before** the ML pipeline
 * Filters clearly invalid inputs (e.g., greetings, random text)
 * Does **not** influence difficulty classification or scoring
-*You can proceed even when the AI predicts the problem  as invalid
+* You can proceed even when the AI predicts the problem  as invalid
 If no API key is provided, the system runs fully offline.
 
 ### Getting a Gemini API Key
