@@ -12,6 +12,9 @@ The system predicts:
 A **Streamlit-based web application** allows users to paste a problem statement and receive predictions.
 
 ---
+## Report Link
+
+[https://docs.google.com/document/d/1u3y4HNYP6p0LakVVUKMxmhR0lQpOHQoicod5ZHAKXXw/edit?tab=t.0](https://docs.google.com/document/d/1u3y4HNYP6p0LakVVUKMxmhR0lQpOHQoicod5ZHAKXXw/edit?tab=t.0)
 
 ## Demo Link
 
