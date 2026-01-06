@@ -81,7 +81,7 @@ All features are combined using a **ColumnTransformer**.
 
 ## Model Design
 
-The system follows a **two-stage classification pipeline**, followed by **class-based score calibration**.
+The system follows a **two-stage classification pipeline**, followed by **predicted class-based score calibration**.
 
 ```
 Input Text
@@ -98,7 +98,7 @@ Stage 1: Hard vs Not-Hard Classifier
           ↓
    Global Score Regressor
           ↓
-   Class-Based Score Calibration
+   Predicted Class-Based Score Calibration
 ```
 
 ---
