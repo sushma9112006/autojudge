@@ -168,8 +168,13 @@ Order: Easy, Hard, Medium
 
 ### Regression Results 
 
-* **MAE**: 1.65
-* **RMSE**: 2.07
+  AFTER CALIBRATION
+* **MAE(after calibration)**: 1.65
+* **RMSE(before calibration)**: 2.07
+  
+BEFORE CALIBRATION
+* **MAE(after calibration)**: 1.67
+* **RMSE(before calibration)**: 2.00
 
 No regression model is trained on test data.
 
