@@ -288,4 +288,7 @@ pip install google-generativeai
 ---
 * **Name**: Charita Sai Sushma J
 * **Project**: Autojudge
+* **Enrollment number**:24114044
+* **Institution**: IIT Roorkee
+* **Branch**: CSE
 ---
