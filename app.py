@@ -5,7 +5,6 @@ import numpy as np
 import time
 import os
 
-st.write("RUNNING FILE:", __file__)
 
 st.set_page_config(
     page_title="Problem Difficulty Predictor",
@@ -178,10 +177,6 @@ def run_prediction_pipeline(full_text_input):
             score = np.clip(raw_score, 2.9, 5.5)
         else:  # hard
             score = np.clip(raw_score, 5.6, 10.0)
-    
-        """st.write("DEBUG LEVEL:", level)
-        st.write("DEBUG RAW SCORE:", raw_score)
-        st.write("DEBUG FINAL SCORE:", score)"""
         st.markdown('<h2 class="result-title">Prediction Results</h2>', unsafe_allow_html=True)
         
         col1, col2 = st.columns([1, 1])
