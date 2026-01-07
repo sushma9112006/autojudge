@@ -1,5 +1,13 @@
 # Problem Difficulty Predictor
 
+## Note on Project Structure
+
+The `autojudge.ipynb` notebook is included **only for experimentation,
+analysis, and training reference**.
+
+The **final runnable and evaluable system** is implemented entirely in
+`app.py` using pre-trained models saved as `.pkl` files.
+
 ## Overview
 
 The **Problem Difficulty Predictor** is a machine learning system that estimates the difficulty of competitive programming problems using **only their textual descriptions**.
@@ -81,7 +89,7 @@ All features are combined using a **ColumnTransformer**.
 
 ## Model Design
 
-The system follows a **two-stage classification pipeline**, followed by **class-based score calibration**.
+The system follows a **two-stage classification pipeline**, followed by **predicted class-based score calibration**.
 
 ```
 Input Text
@@ -98,7 +106,7 @@ Stage 1: Hard vs Not-Hard Classifier
           ↓
    Global Score Regressor
           ↓
-   Class-Based Score Calibration
+   Predicted Class-Based Score Calibration
 ```
 
 ---
@@ -170,10 +178,10 @@ Order: Easy, Hard, Medium
 
   AFTER CALIBRATION
 * **MAE(after calibration)**: 1.65
-* **RMSE(before calibration)**: 2.07
+* **RMSE(after calibration)**: 2.07
   
 BEFORE CALIBRATION
-* **MAE(after calibration)**: 1.67
+* **MAE(before calibration)**: 1.67
 * **RMSE(before calibration)**: 2.00
 
 No regression model is trained on test data.
@@ -250,7 +258,7 @@ http://localhost:8501
 
 ---
 
-## Optional: AI-Based Input Validation
+## **Optional**: AI-Based Input Validation
 
 An optional validation layer uses **Google Gemini** to check whether the input resembles a programming problem.
 
@@ -288,4 +296,7 @@ pip install google-generativeai
 ---
 * **Name**: Charita Sai Sushma J
 * **Project**: Autojudge
+* **Enrollment number**:24114044
+* **Institution**: IIT Roorkee
+* **Branch**: CSE
 ---
