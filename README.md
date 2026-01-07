@@ -31,6 +31,13 @@ A **Streamlit-based web application** allows users to paste a problem statement 
 [https://sushma9112006-autojudge-app-f60sdv.streamlit.app/](https://sushma9112006-autojudge-app-f60sdv.streamlit.app/)
 
 ---
+## Note on Project Structure
+
+The `autojudge.ipynb` notebook is included **only for experimentation,
+analysis, and training reference**.
+
+The **final runnable and evaluable system** is implemented entirely in
+`app.py` using pre-trained models saved as `.pkl` files.
 
 ## Dataset
 
@@ -170,10 +177,10 @@ Order: Easy, Hard, Medium
 
   AFTER CALIBRATION
 * **MAE(after calibration)**: 1.65
-* **RMSE(before calibration)**: 2.07
+* **RMSE(after calibration)**: 2.07
   
 BEFORE CALIBRATION
-* **MAE(after calibration)**: 1.67
+* **MAE(before calibration)**: 1.67
 * **RMSE(before calibration)**: 2.00
 
 No regression model is trained on test data.
@@ -250,7 +257,7 @@ http://localhost:8501
 
 ---
 
-## Optional: AI-Based Input Validation
+## **Optional**: AI-Based Input Validation
 
 An optional validation layer uses **Google Gemini** to check whether the input resembles a programming problem.
 
