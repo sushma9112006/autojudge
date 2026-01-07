@@ -1,5 +1,13 @@
 # Problem Difficulty Predictor
 
+## Note on Project Structure
+
+The `autojudge.ipynb` notebook is included **only for experimentation,
+analysis, and training reference**.
+
+The **final runnable and evaluable system** is implemented entirely in
+`app.py` using pre-trained models saved as `.pkl` files.
+
 ## Overview
 
 The **Problem Difficulty Predictor** is a machine learning system that estimates the difficulty of competitive programming problems using **only their textual descriptions**.
@@ -31,13 +39,6 @@ A **Streamlit-based web application** allows users to paste a problem statement 
 [https://sushma9112006-autojudge-app-f60sdv.streamlit.app/](https://sushma9112006-autojudge-app-f60sdv.streamlit.app/)
 
 ---
-## Note on Project Structure
-
-The `autojudge.ipynb` notebook is included **only for experimentation,
-analysis, and training reference**.
-
-The **final runnable and evaluable system** is implemented entirely in
-`app.py` using pre-trained models saved as `.pkl` files.
 
 ## Dataset
 
